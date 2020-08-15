@@ -11,7 +11,7 @@ const login = async () => {
       redirect_uri: window.location.origin,
     });
   } catch (err) {
-    console.log("Log in failed", err);
+    console.log('Log in failed', err);
   }
 };
 
@@ -24,14 +24,14 @@ const logout = () => {
       returnTo: window.location.origin,
     });
   } catch (err) {
-    console.log("Log out failed", err);
+    console.log('Log out failed', err);
   }
 };
 
 /**
  * Retrieves the auth configuration from the server
  */
-const fetchAuthConfig = () => fetch("/auth_config.json");
+const fetchAuthConfig = () => fetch('/auth_config.json');
 
 /**
  * Checks to see if the user is authenticated. If so, `fn` is executed. Otherwise, the user
@@ -49,13 +49,14 @@ const requireAuth = async (fn, targetUrl) => {
 };
 
 const authenticateUser = async () => {
+  console.log('logg user in');
   const a0 = new Auth0Client({
     domain: config.domain,
     client_id: config.clientId,
   });
   await a0.loginWithPopup({
     max_age: 0,
-    scope: "openid",
+    scope: 'openid',
   });
   return await a0.getIdTokenClaims();
 };
@@ -74,17 +75,17 @@ const linkAccount = async () => {
       `Account linking is only allowed to a verified account. Please verify your email ${email}.`
     );
   }
-
-  await fetch(`https://${config.domain}/api/v2/users/${sub}/identities`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify({
-      link_with: targetUserIdToken,
-    }),
-  });
+  console.log(targetUserIdToken);
+  // await fetch(`https://${config.domain}/api/v2/users/${sub}/identities`, {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //     Authorization: `Bearer ${accessToken}`,
+  //   },
+  //   body: JSON.stringify({
+  //     link_with: targetUserIdToken,
+  //   }),
+  // });
 };
 
 const unlinkAccount = async (secondaryIdentity) => {
@@ -94,7 +95,7 @@ const unlinkAccount = async (secondaryIdentity) => {
   await fetch(
     `https://${config.domain}/api/v2/users/${sub}/identities/${provider}/${user_id}`,
     {
-      method: "DELETE",
+      method: 'DELETE',
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -124,11 +125,11 @@ window.onload = async () => {
     client_id: config.clientId,
     audience: `https://${config.domain}/api/v2/`,
     scope:
-      "openid email profile read:current_user update:current_user_identities",
+      'openid email profile read:current_user update:current_user_identities',
   });
 
   const query = window.location.search;
-  const shouldParseResult = query.includes("code=") && query.includes("state=");
+  const shouldParseResult = query.includes('code=') && query.includes('state=');
   if (shouldParseResult) {
     try {
       const result = await auth0.handleRedirectCallback();
@@ -146,13 +147,13 @@ window.onload = async () => {
       try {
         await auth0.getTokenSilently({ ignoreCache: true });
       } catch ({ error }) {
-        if (error === "login_required") {
+        if (error === 'login_required') {
           console.warn(`Silent authentication failed with *login_required* error. This is possibly due to 3rd party cookies blocked in the browser. 
           Considering using a custom domain or refresh_token mode of the SDK. https://github.com/auth0/auth0-spa-js#refresh-token-fallback`);
         }
       }
     } catch (err) {
-      console.log("Error parsing redirect:", err);
+      console.log('Error parsing redirect:', err);
     }
   }
 
@@ -164,10 +165,10 @@ window.onload = async () => {
 
   const isAuthenticated = await auth0.isAuthenticated();
   if (isAuthenticated) {
-    window.history.replaceState({ url: "/profile" }, {}, "/profile");
-    showContentFromUrl("/profile");
+    window.history.replaceState({ url: '/profile' }, {}, '/profile');
+    showContentFromUrl('/profile');
   } else {
-    window.history.replaceState({ url: "/" }, {}, "/");
-    showContentFromUrl("/");
+    window.history.replaceState({ url: '/' }, {}, '/');
+    showContentFromUrl('/');
   }
 };
